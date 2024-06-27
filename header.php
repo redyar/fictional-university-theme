@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php wp_head(); ?>
-    <title>Document</title>
+    <title>University</title>
 </head>
 <body>
-<header class="site-header">
+    <header class="site-header">
       <div class="container">
         <h1 class="school-logo-text float-left">
           <a href="#"><strong>Fictional</strong> University</a>
