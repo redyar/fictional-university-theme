@@ -14,4 +14,7 @@ function university_files() {
 
 function uninversity_features() {
     add_theme_support('title-tag');
+    register_nav_menu('headerMenuLocation', 'Header Menu Location');
+    register_nav_menu('footerMenuLocationOne', 'Footer Menu Location');
+    register_nav_menu('footerMenuLocationTwo', 'Footer Menu Location Two');
 }
