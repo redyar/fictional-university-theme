@@ -4,6 +4,8 @@ add_action( 'wp_enqueue_scripts',  'university_files' );
 
 add_action( 'after_setup_theme', 'uninversity_features' );
 
+add_action('init', 'university_post_type');
+
 function university_files() {
     wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);
     wp_enqueue_style('custom-google-fonts', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
@@ -17,4 +19,19 @@ function uninversity_features() {
     register_nav_menu('headerMenuLocation', 'Header Menu Location');
     register_nav_menu('footerMenuLocationOne', 'Footer Menu Location');
     register_nav_menu('footerMenuLocationTwo', 'Footer Menu Location Two');
+}
+
+function university_post_type() {
+    register_post_type('event', array(
+        'public'    => true,
+        'show_in_rest' => true,
+        'labels'    => array(
+            'name'          => 'Events',
+            'add_new_item'  => 'Add New Event',
+            'edit_item'     => 'Edit Event',
+            'all_items'     => 'All Events',
+            'singular_name' => 'Event',
+        ),
+        'menu_icon' => 'dashicons-calendar'
+    ));
 }
