@@ -6,6 +6,32 @@ add_action( 'after_setup_theme', 'uninversity_features' );
 
 add_action('init', 'university_post_type');
 
+function pageBanner($args = NULL) {
+
+    $default_image = get_theme_file_uri('images/ocean.jpg');
+    $banner_image = get_field('page_banner_image');
+    $pageBannerSubtitle = get_field('page_banner_subtitle');
+
+    if( !isset($args['title']) ) {
+        $args['title'] = get_the_title();
+    };
+    
+    if( !isset($args['subtitle']) ) {
+        $args['subtitle'] = $pageBannerSubtitle;
+    };
+    ?>
+        <div class="page-banner">
+      <div class="page-banner__bg-image" style="background-image: url(<?php echo ( ! empty($banner_image['sizes']['pageBanner']) ? $banner_image['sizes']['pageBanner'] : $default_image); ?>">
+        </div>
+      <div class="page-banner__content container container--narrow">
+        <h1 class="page-banner__title"><?php echo $args['title']; ?></h1>
+        <div class="page-banner__intro">
+          <p><?php echo $args['subtitle']; ?></p>
+        </div>
+      </div>
+    </div>
+<?php }
+
 function university_files() {
     wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);
     wp_enqueue_style('custom-google-fonts', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
