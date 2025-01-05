@@ -2,17 +2,35 @@
   <div class="page-banner">
     <div class="page-banner__bg-image" style="background-image: url(<?php echo get_theme_file_uri('images/ocean.jpg') ?>"></div>
     <div class="page-banner__content container container--narrow">
-    <h1 class="page-banner__title">All Events</h1>
+    <h1 class="page-banner__title">Past Events</h1>
       <div class="page-banner__intro">
-        <p>See our World!</p>
+        <p>All our Past Events!</p>
       </div>
     </div>
   </div>
 
   <div class="container container--narrow page-section">
     <?php
-      while(have_posts()) {
-        the_post();?>
+    $today = date('Ymd');
+    $pastEvent = new WP_Query(array(
+        'paged'          => get_query_var('paged', 1), //for pagination
+        'posts_per_page' => -1,
+        'post_type'      => 'event',
+        'meta_key'       => 'event_month',
+        'orderby'        => 'meta_value_num',
+        'order'          => 'ASC',
+        'meta_query'     => array(
+          array(
+            'key'     => 'event_month',
+            'compare' => '<',
+            'value'   => $today,
+            'type'    => 'numeric'
+          )
+        )
+      ));
+
+      while($pastEvent->have_posts()) {
+        $pastEvent->the_post();?>
             <?php
             $event_date = get_field('event_month');
             $date = new DateTime($event_date);
@@ -30,11 +48,10 @@
 
       <?php }
 
-      echo paginate_links();
+      echo paginate_links(array(
+        'total' => $pastEvent->max_num_pages,
+      ));
     ?>
-
-        <p>Looking for a recap of past events? <a href="<?php echo site_url('/past-events'); ?>">Check out our past events archive.</a></p>
-
   </div>
 
 <?php get_footer(); ?>
