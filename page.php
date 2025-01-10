@@ -2,6 +2,13 @@
 
 get_header();
 
+
+
+
+// if (is_page( sanitize_title('/terms-of-service') )) {
+//   echo 'hell';
+// };
+
 while (have_posts()) {
   the_post();
 
