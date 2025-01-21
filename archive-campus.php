@@ -6,6 +6,56 @@
   ));
 ?>
 
+<!-- 
+<script>
+
+update = function(el) {
+  el.parentElement.setAttribute('data-value', el.value)
+}
+
+</script>
+<?
+
+// $username= 'casdaczxc';
+// $usernamelength= strlen($username);
+// if ($usernamelength > 1){
+//   $username = strtoupper(mb_substr($username, 0, 1)) . '.';
+// }else {
+//   $username = strtoupper ($username);
+// };
+
+// $usernamelength > 1 ? $username = strtoupper(mb_substr($username, 0, 1)) . '.' : $username = strtoupper ($username);
+// echo $username;
+?>
+<style>
+  span[data-value] {
+    position: relative;
+    text-transform: uppercase;
+  }
+  span[data-value]:after {
+    content: attr(data-value) ".";
+    position: absolute;
+    top: 2px; /* Borders */
+    left: 2px; /* Borders */
+  }
+  span[data-value] input {
+    color: #FFF; /* Optional bug avoid visual bugs */
+  }
+ 
+</style>
+
+<span data-value="">
+  <input type="text" class="normal igogo" name="Name" size="20" maxlength="1" style="text-transform:uppercase" oninput="update(this)"/> 
+</span> -->
+
+
+<!-- <div data-value="">
+  <input maxlength="1"   oninput="update(this)"/>
+</div> -->
+
+
+
+
 
   <div class="container container--narrow page-section">
     <div class="acf-map">
