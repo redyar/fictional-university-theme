@@ -200,11 +200,11 @@ __webpack_require__.r(__webpack_exports__);
 class Search {
   // 1. describe and create/initiate our object
   constructor() {
-    // добавляем HTML код с блоком поиска в footer   
+    // добавляем HTML код с блоком поиска в footer
     this.addSearchHTML();
-    // получаем поля в которое будем выводить результаты поиска  
+    // получаем поля в которое будем выводить результаты поиска
     this.resultsDiv = jquery__WEBPACK_IMPORTED_MODULE_0___default()("#search-overlay__results");
-    // получаем лупу, кнопка для открытия поля поиска  
+    // получаем лупу, кнопка для открытия поля поиска
     this.openButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".js-search-trigger");
     // получаем крестик, кнопка закрытия окна поиска
     this.closeButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay__close");
@@ -253,26 +253,84 @@ class Search {
   //Asynchronous - все действия происходят в одно время
 
   getResults() {
-    // в файле functions.php зарегистрировали php-функцию(universityData.root_url) c адресом сайта для нашего скрипта 
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/university/v1/search?term=" + this.searchField.val(), results => {
+      this.resultsDiv.html(`
+                <div class="row">
+                    <div class="one-third">
+                        <h2 class="search-overlay__section-title">General Info</h2>
+                        ${results.generalInfo.length ? '<ul class="link-list link0list">' : '<p> No mathches. </p>'}
+                            ${results.generalInfo.map(item => `<li><a href="${item.permalink}">${item.title}</a> ${item.post_type == 'post' ? `by ${item.authorName}` : ''} </li> <img class='img_search' src="${item.perfectImage ? item.perfectImage : ''}">`).join(' ')}
+                        ${results.generalInfo.length ? "</ul>" : ' '}
+                    </div>
+                    <div class="one-third">
+                        <h2 class="search-overlay__section-title">Programs</h2>
+                        ${results.programs.length ? '<ul class="link-list link0list">' : `<p> No Programs mathches. <a href="${universityData.root_url}/programs">View all Programs</a> </p>`}
+                            ${results.programs.map(item => `<li><a href="${item.permalink}">${item.title}</a></li> <img class='img_search' src="${item.perfectImage ? item.perfectImage : ''}">`).join(' ')}
+                        ${results.programs.length ? "</ul>" : ' '}
+                        <h2 class="search-overlay__section-title">Professors</h2>
+                        ${results.professors.length ? '<ul class="professor-cards">' : `<p> No Professors mathches.</p>`}
+                            ${results.professors.map(item => `
+                                <li class="professor-card__list-item">
+                                    <a class="professor-card" href="${item.permalink}">
+                                        <img class="professor-card__image" src="${item.thumbnail}" alt="">
+                                        <span class="professor-card__name">${item.title}</span>
+                                    </a>
+                                </li>
+                            `).join(' ')}
+                        ${results.professors.length ? "</ul>" : ' '}
+                    </div>
+                    <div class="one-third">
+                        <h2 class="search-overlay__section-title">Campuses</h2>
+                        ${results.campuses.length ? '<ul class="link-list link0list">' : `<p> No Campus mathches. <a href="${universityData.root_url}/campuses">View all Programs</a> </p>`}
+                            ${results.campuses.map(item => `<li><a href="${item.permalink}">${item.title}</a></li> <img class='img_search' src="${item.perfectImage ? item.perfectImage : ''}">`).join(' ')}
+                        ${results.campuses.length ? "</ul>" : ' '}
+                        <h2 class="search-overlay__section-title">Events</h2>
+                        ${results.events.length ? '' : `<p> No events mathches. <a href="${universityData.root_url}/events">View all Events</a> </p>`}
+                            ${results.events.map(item => `
+                                <?php
+                                    
+                                ?>
+                                <div class="event-summary">
+                                    <a class="event-summary__date t-center" href="${item.permalink}">
+                                        <span class="event-summary__month">${item.month}</span>
+                                        <span class="event-summary__day">${item.day}</span>
+                                    </a>
+                                    <div class="event-summary__content">
+                                        <h5 class="event-summary__title headline headline--tiny"><a href="${item.permalink}">${item.title}</a></h5>
+                                        <p>${item.content}<a href="${item.permalink}" class="nu gray">Learn more</a></p>
+                                    </div>
+                                </div>
+                            `).join(' ')}
+                    </div>
+                </div>
+            `);
+      this.isSpinnerVisible = false;
+    });
+
+    // в файле functions.php зарегистрировали php-функцию(universityData.root_url) c адресом сайта для нашего скрипта
     //  используем тернарный оператор, что-бы определить приходящий ответ от JSON
     //  Если posts.length(определяет длинну) true, добавляем <ul> else добавляем <p>
     // $.when() - Для обеспечения одновременной обработки нескольких Ajax-запросов
     // .then() - После завершения всех запросов результата будут обработаны в обработчике
 
-    jquery__WEBPACK_IMPORTED_MODULE_0___default().when(jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + '/wp-json/wp/v2/posts?search=' + this.searchField.val()), jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + '/wp-json/wp/v2/pages?search=' + this.searchField.val())).then((posts, pages) => {
-      // переменная combinedResults для комбинирования вывода запросов из posts and pages
-      var combinedResults = posts[0].concat(pages[0]);
-      this.resultsDiv.html(`
-                    <h2 class="search-overlay__section-title">General Info</h2>
-                    ${combinedResults.length ? '<ul class="link-list link0list">' : '<p> No mathches. </p>'}
-                        ${combinedResults.map(item => `<li><a href="${item.link}">${item.title.rendered}</a> ${item.type == 'post' ? `by ${item.authorName}` : ''} </li> <img class='img_search' src="${item.perfectImage ? item.perfectImage : ''}">`).join(' ')}
-                    ${combinedResults.length ? "</ul>" : ' '}
-                `);
-      // отключаем спинер, что-бы при повторном поиске он запустился заново
-      this.isSpinnerVisible = false;
-    }, () => {
-      this.resultsDiv.html('<p>Unexpected Error</p>');
-    });
+    // $.when(
+    //     $.getJSON(universityData.root_url + '/wp-json/wp/v2/posts?search=' + this.searchField.val()),
+    //      $.getJSON(universityData.root_url + '/wp-json/wp/v2/pages?search=' + this.searchField.val())
+    //     ).then((posts, pages) => {
+    //         // переменная combinedResults для комбинирования вывода запросов из posts and pages
+    //         var combinedResults = posts[0].concat(pages[0]);
+
+    //         this.resultsDiv.html(`
+    //             <h2 class="search-overlay__section-title">General asascdascInfo</h2>
+    //             ${ combinedResults.length ? '<ul class="link-list link0list">' : '<p> No mathches. </p>'}
+    //                 ${ combinedResults.map(item => `<li><a href="${ item.link }">${ item.title.rendered }</a> ${ item.type == 'post' ? `by ${ item.authorName }` : '' } </li> <img class='img_search' src="${ item.perfectImage ? item.perfectImage : '' }">`).join(' ')}
+    //             ${ combinedResults.length ? "</ul>" : ' ' }
+    //         `);
+    //         // отключаем спинер, что-бы при повторном поиске он запустился заново
+    //         this.isSpinnerVisible = false;
+    // }, () => {
+    //     this.resultsDiv.html('<p>Unexpected Error</p>');
+    // });
   }
   openOverlay() {
     this.searchOverlay.addClass("search-overlay--active");
@@ -312,12 +370,11 @@ class Search {
                         <input id="search-term" type="text" autocomplete="off" class="search-term" placeholder="What are you looking for?">
                     <i class="fa fa-window-close search-overlay__close" aria-hidden="true"></i>
                     </div>
-                </div> 
-                
+                </div>
                 <div class="container">
                     <div id="search-overlay__results"></div>
                 </div>
-            </div>    
+            </div>
         `);
   }
 }
