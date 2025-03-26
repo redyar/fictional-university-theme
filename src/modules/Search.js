@@ -7,11 +7,11 @@ class Search {
 
     // 1. describe and create/initiate our object
     constructor() {
-       // добавляем HTML код с блоком поиска в footer   
+       // добавляем HTML код с блоком поиска в footer
        this.addSearchHTML();
-       // получаем поля в которое будем выводить результаты поиска  
+       // получаем поля в которое будем выводить результаты поиска
        this.resultsDiv    = $("#search-overlay__results");
-       // получаем лупу, кнопка для открытия поля поиска  
+       // получаем лупу, кнопка для открытия поля поиска
        this.openButton    = $(".js-search-trigger");
        // получаем крестик, кнопка закрытия окна поиска
        this.closeButton   = $(".search-overlay__close");
@@ -54,7 +54,6 @@ class Search {
                 this.isSpinnerVisible = false;
             }
         }
-        
         this.previousValue = this.searchField.val();
     }
 
@@ -63,32 +62,56 @@ class Search {
     //Asynchronous - все действия происходят в одно время
 
     getResults() {
-        // в файле functions.php зарегистрировали php-функцию(universityData.root_url) c адресом сайта для нашего скрипта 
+        $.getJSON(universityData.root_url + '/wp-json/university/v1/search?term' + this.searchField.val(), (results) => {
+            this.resultsDiv.html(`
+                <div class="row">
+                    <div class="one-third">
+                        <h2 class="search-overlay__section-title">Generaasdasdasdl Info</h2>
+                        ${ results.generalInfo.length ? '<ul class="link-list link0list">' : '<p> No mathches. </p>'}
+                            ${ results.generalInfo.map(item => `<li><a href="${ item.link }">${ item.title.rendered }</a> ${ item.type == 'post' ? `by ${ item.authorName }` : '' } </li> <img class='img_search' src="${ item.perfectImage ? item.perfectImage : '' }">`).join(' ')}
+                        ${ results.generalInfo.length ? "</ul>" : ' ' }
+                    </div>
+                    <div class="one-third">
+                        <h2 class="search-overlay__section-title">Programs</h2>
+
+                        <h2 class="search-overlay__section-title">Professors</h2>
+
+                    </div>
+                    <div class="one-third">
+                        <h2 class="search-overlay__section-title">Campuses</h2>
+
+                        <h2 class="search-overlay__section-title">Events</h2>
+                    </div>
+                </div>
+            `);
+        }) ;
+
+
+        // в файле functions.php зарегистрировали php-функцию(universityData.root_url) c адресом сайта для нашего скрипта
         //  используем тернарный оператор, что-бы определить приходящий ответ от JSON
         //  Если posts.length(определяет длинну) true, добавляем <ul> else добавляем <p>
         // $.when() - Для обеспечения одновременной обработки нескольких Ajax-запросов
         // .then() - После завершения всех запросов результата будут обработаны в обработчике
-        
-        $.when(
-            $.getJSON(universityData.root_url + '/wp-json/wp/v2/posts?search=' + this.searchField.val()),
-             $.getJSON(universityData.root_url + '/wp-json/wp/v2/pages?search=' + this.searchField.val())
-            ).then((posts, pages) => {
-                // переменная combinedResults для комбинирования вывода запросов из posts and pages
-                var combinedResults = posts[0].concat(pages[0]);
 
-                this.resultsDiv.html(`
-                    <h2 class="search-overlay__section-title">General Info</h2>
-                    ${ combinedResults.length ? '<ul class="link-list link0list">' : '<p> No mathches. </p>'}
-                        ${ combinedResults.map(item => `<li><a href="${ item.link }">${ item.title.rendered }</a> ${ item.type == 'post' ? `by ${ item.authorName }` : '' } </li> <img class='img_search' src="${ item.perfectImage ? item.perfectImage : '' }">`).join(' ')}
-                    ${ combinedResults.length ? "</ul>" : ' ' }
-                `);
-                // отключаем спинер, что-бы при повторном поиске он запустился заново
-                this.isSpinnerVisible = false;
-        }, () => {
-            this.resultsDiv.html('<p>Unexpected Error</p>');
-        });
+        // $.when(
+        //     $.getJSON(universityData.root_url + '/wp-json/wp/v2/posts?search=' + this.searchField.val()),
+        //      $.getJSON(universityData.root_url + '/wp-json/wp/v2/pages?search=' + this.searchField.val())
+        //     ).then((posts, pages) => {
+        //         // переменная combinedResults для комбинирования вывода запросов из posts and pages
+        //         var combinedResults = posts[0].concat(pages[0]);
 
-      
+        //         this.resultsDiv.html(`
+        //             <h2 class="search-overlay__section-title">General asascdascInfo</h2>
+        //             ${ combinedResults.length ? '<ul class="link-list link0list">' : '<p> No mathches. </p>'}
+        //                 ${ combinedResults.map(item => `<li><a href="${ item.link }">${ item.title.rendered }</a> ${ item.type == 'post' ? `by ${ item.authorName }` : '' } </li> <img class='img_search' src="${ item.perfectImage ? item.perfectImage : '' }">`).join(' ')}
+        //             ${ combinedResults.length ? "</ul>" : ' ' }
+        //         `);
+        //         // отключаем спинер, что-бы при повторном поиске он запустился заново
+        //         this.isSpinnerVisible = false;
+        // }, () => {
+        //     this.resultsDiv.html('<p>Unexpected Error</p>');
+        // });
+
     }
 
     openOverlay() {
@@ -133,12 +156,11 @@ class Search {
                         <input id="search-term" type="text" autocomplete="off" class="search-term" placeholder="What are you looking for?">
                     <i class="fa fa-window-close search-overlay__close" aria-hidden="true"></i>
                     </div>
-                </div> 
-                
+                </div>
                 <div class="container">
                     <div id="search-overlay__results"></div>
                 </div>
-            </div>    
+            </div>
         `);
     }
 }
