@@ -7,7 +7,10 @@
     pageBanner();
      ?>
 
+
+
     <div class="container container--narrow page-section">
+
     <?php
       $theParent = wp_get_post_parent_id(get_the_ID());
       if ($theParent) { ?>
@@ -16,6 +19,9 @@
     </div>
       <?php }
     ?>
+
+
+
     <?php
     $testArray = get_pages(array(
       'child_of' => get_the_ID()
@@ -41,14 +47,20 @@
       </ul>
     </div>
     <?php } ?>
-    
+
 
     <div class="generic-content">
-      <?php the_content(); ?>
+        <form class="search-form" method="get" action="<?php echo esc_url( site_url('/') ); ?>">
+        <label class="headline headline--medium" label for="s">New Search</label>
+            <div class="search-form-row">
+                <input placeholder="What are you lookingfor" class="s" id="s" type="search" name="s">
+                <input class="search-submit" type="submit" valur="Search">
+            </div>
+        </form>
     </div>
 
   </div>
-    
+
   <?php }
 
   get_footer();

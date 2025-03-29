@@ -38,7 +38,7 @@ function pageBanner($args = NULL) {
     if( !isset($args['title']) ) {
         $args['title'] = get_the_title();
     };
-    
+
     if( !isset($args['subtitle']) ) {
         $args['subtitle'] = $pageBannerSubtitle;
     };
