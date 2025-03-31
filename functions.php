@@ -12,6 +12,26 @@ function university_custome_rest() {
         'get_callback' => function() { return  get_the_post_thumbnail_url(); }
     ));
 };
+add_action('admin_init', 'redirectSubsToFrontend');
+
+function redirectSubsToFrontend(){
+    $ourCurrendUser = wp_get_current_user();
+
+    if(count( $ourCurrendUser->roles ) == 1 AND $ourCurrendUser->roles[0] == 'subscriber') {
+        wp_redirect(site_url('/'));
+        exit;
+    }
+};
+
+add_action('wp_loaded', 'noSubsAdminBar');
+
+function noSubsAdminBar(){
+    $ourCurrendUser = wp_get_current_user();
+
+    if(count( $ourCurrendUser->roles ) == 1 AND $ourCurrendUser->roles[0] == 'subscriber') {
+        show_admin_bar(false);
+    }
+};
 
 // Срабатывает в начале обработки REST API запроса
 add_action('rest_api_init', 'university_custome_rest');
@@ -273,3 +293,6 @@ if( function_exists('acf_add_options_page') ) {
         'redirect'      => false
     ));
 }
+
+// Redirect subscriber acc out of admin and onto homepage
+
