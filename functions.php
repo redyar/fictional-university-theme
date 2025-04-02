@@ -12,16 +12,6 @@ function university_custome_rest() {
         'get_callback' => function() { return  get_the_post_thumbnail_url(); }
     ));
 };
-add_action('admin_init', 'redirectSubsToFrontend');
-
-function redirectSubsToFrontend(){
-    $ourCurrendUser = wp_get_current_user();
-
-    if(count( $ourCurrendUser->roles ) == 1 AND $ourCurrendUser->roles[0] == 'subscriber') {
-        wp_redirect(site_url('/'));
-        exit;
-    }
-};
 
 add_action('wp_loaded', 'noSubsAdminBar');
 
@@ -87,7 +77,8 @@ function university_files() {
     // Эта функция регистрирует данные для указанного скрипта, затем перед выводом (подключением) самого скрипта указанные в этой функции данные выводятся в теге <script> в виде JS объекта.
     // Добавляем функцию адреса сайта для основного JS скрипта
     wp_localize_script('main-university-js', 'universityData', array(
-        'root_url' => get_site_url()
+        'root_url' => get_site_url(),
+        'nonce' => wp_create_nonce('wp_rest')
     ));
 
 }
@@ -295,4 +286,35 @@ if( function_exists('acf_add_options_page') ) {
 }
 
 // Redirect subscriber acc out of admin and onto homepage
+add_action('admin_init', 'redirectSubsToFrontend');
 
+function redirectSubsToFrontend(){
+    $ourCurrendUser = wp_get_current_user();
+
+    if(count( $ourCurrendUser->roles ) == 1 AND $ourCurrendUser->roles[0] == 'subscriber') {
+        wp_redirect(site_url('/'));
+        exit;
+    }
+};
+
+// Customize login screen
+add_filter('login_headerurl', 'ourHeaderUrl');
+
+function ourHeaderUrl(){
+    return esc_url( site_url('/') );
+}
+
+add_filter('login_headertitle', 'ourHeaderText');
+
+function ourHeaderText(){
+    return get_bloginfo('name');
+}
+
+add_action('login_enqueue_scripts', 'ourLoginCSS');
+
+function ourLoginCSS(){
+    wp_enqueue_style('font-awesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+    wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));
+    wp_enqueue_style('univ', get_theme_file_uri('/style.css'));
+    wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
+}
