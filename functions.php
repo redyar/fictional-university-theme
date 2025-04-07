@@ -1,11 +1,17 @@
 <?php
 
 require get_theme_file_path('/inc/search-route.php');
+require get_theme_file_path('/inc/like-route.php');
 
 // Добавляем поля ИмяАвтора в запрос Rest Api
 function university_custome_rest() {
     register_rest_field('post', 'authorName', array(
         'get_callback' => function() { return get_the_author(); }
+    ));
+
+    // Добавляем поле с количеством постов пользователя в Rest API
+    register_rest_field('note', 'userNoteCount', array(
+        'get_callback' => function() { return count_user_posts(get_current_user_id(), 'note'); }
     ));
 
     register_rest_field('post', 'perfectImage', array(
@@ -318,3 +324,29 @@ function ourLoginCSS(){
     wp_enqueue_style('univ', get_theme_file_uri('/style.css'));
     wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
 }
+
+// Force note posts to be private
+// wp_insert_post_data - Фильтрует данные записи, прямо перед тем, как вставить или обновить их в БД через функцию wp_insert_post(). Все данные экранированы слэшами!
+add_filter ('wp_insert_post_data', 'makenotePrivate', 10, 2); // 2 - Говорим фильтру, что функция будет работать с двумя параметрами
+
+function makenotePrivate($data, $postarr) {
+
+    if( $data['post_type'] == 'note' ) {
+
+        // ограничиваем количество заметок до 4-х
+        if(count_user_posts(get_current_user_id(), 'note') >= 14 & !$postarr['ID']) { // count_user_posts - Получает количество записей указанного типа для указанного пользователя (автора).
+            die("You have reached your note limit.");
+        }
+
+        $data['post_content'] = sanitize_text_field($data['post_content']); // sanitize_text_field - Очищает переданную строку оставляя чистый текст: без HTML тегов, переносов строк и т.д.
+        $data['post_title'] = sanitize_text_field($data['post_title']);
+    }
+
+    // Делать посты Private по умолчанию
+    if( $data['post_type'] == 'note' AND $data['post_status'] != 'trash') {
+        $data['post_status'] = 'private';
+    }
+
+    return $data;
+}
+

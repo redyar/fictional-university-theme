@@ -15,7 +15,45 @@ while (have_posts()) {
       <div class="generic-content">
         <div class="row group">
             <div class="one-third"><?php the_post_thumbnail('professorPortrait'); ?></div>
-            <div class="two-third"><?php the_content(); ?></div>
+            <div class="two-thirds">
+              <?php
+                $likeCount = new WP_Query(array(
+                  'post_type' => 'like',
+                  'meta_query' => array(
+                    array(
+                      'key' => 'liked_professor_id',
+                      'compare' => '=',
+                      'value' => get_the_ID(),
+                    )
+                  )
+                ));
+                $existStatus = 'no';
+
+                if( is_user_logged_in() ){
+                  $existQuery = new WP_Query(array(
+                    'author' => get_current_user_id(),
+                    'post_type' => 'like',
+                    'meta_query' => array(
+                      array(
+                        'key' => 'liked_professor_id',
+                        'compare' => '=',
+                        'value' => get_the_ID(),
+                      )
+                    )
+                  ));
+                  if($existQuery->found_posts) {
+                    $existStatus = 'yes';
+                  }
+                }
+              ?>
+            <span class="like-box" data-like="<?php if (isset($existQuery->posts[0]->ID)) echo $existQuery->posts[0]->ID; ?>" data-professor="<?php the_ID(); ?>" data-exists="<?php echo $existStatus; ?>">
+            <span style="padding-left: 10px;"><?php echo get_the_title(); ?></span>
+                <i class="fa fa-heart-o" area-hidden="true"></i>
+                <i class="fa fa-heart" area-hidden="true"></i>
+                <span class="like-count"><?php echo $likeCount->found_posts; ?></span>
+              </span>
+              <?php the_content(); ?>
+          </div>
             <img width="400" height="400" src="<?php get_field('image_mobile'); ?>" class="attachment-shop_catalog size-shop_catalog wp-post-image" alt="" srcset=" <?php get_field('image_mobile'); ?> 100w, <?php get_field('image_mobile_1'); ?> 400w," sizes="(max-width: 767px) 89vw, (max-width: 1000px) 54vw, (max-width: 1071px) 543px, 580px">
 
             <?php $slides = get_field('mobile_and_desctop'); ?>
@@ -39,12 +77,12 @@ while (have_posts()) {
     <div id="output">Текст будет вставлен сюда</div>
 
 
-    <div class="hello"> 
-        <p>first</p> 
+    <div class="hello">
+        <p>first</p>
         <p>second</p>
     </div>
 
-    
+
     <script>
 
         let inp = document.getElementById("myTextarea");
@@ -129,8 +167,8 @@ while (have_posts()) {
             <?php endforeach; ?>
 
         </div>
-        <div class="helloo"> 
-    <h3>first</h3> 
+        <div class="helloo">
+    <h3>first</h3>
     <p>second</p>
 </div>
 
@@ -178,14 +216,14 @@ while (have_posts()) {
 <script>
     // Находим элемент с классом hello
     var div = document.querySelector('.helloo');
-    
+
     // Находим первый элемент h3 внутри этого div
     var h3 = div.querySelector('h3');
-    
+
     // Создаем новый элемент с текстом
     var newText = document.createElement('p'); // например, создадим новый параграф
     newText.textContent = 'Этот текст вставлен после первого h3.';
-    
+
     // Вставляем новый элемент после h3
     h3.insertAdjacentElement('afterend', newText);
 
